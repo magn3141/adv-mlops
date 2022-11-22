@@ -1,0 +1,121 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: train-boundaries-
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.8.14, pipelines.kubeflow.org/pipeline_compilation_time: '2022-11-06T11:00:02.725120',
+    pipelines.kubeflow.org/pipeline_spec: '{"description": "Train boundaries for a
+      StyleGAN model.", "inputs": [{"default": "20", "name": "number_of_images", "optional":
+      true, "type": "Integer"}, {"default": "256", "name": "image_size", "optional":
+      true, "type": "Integer"}, {"default": "smile", "name": "classifier_type", "optional":
+      true, "type": "String"}], "name": "Train Boundaries"}'}
+  labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.8.14}
+spec:
+  entrypoint: train-boundaries
+  templates:
+  - name: component
+    container:
+      args: []
+      command: [python3, /pipelines/component/src/0_run_sampler.py, --output-dir-images,
+        /tmp/outputs/Images_dir/data, --output-file-seeds, /tmp/outputs/Seeds_file/data,
+        --output-file-scores, /tmp/outputs/Scores_file/data, --amount-of-image, '{{inputs.parameters.number_of_images}}',
+        --stylegan-path, /tmp/inputs/StyleGan_Path/data, --image-size, '{{inputs.parameters.image_size}}']
+      image: us-central1-docker.pkg.dev/inductive-world-365914/adv-mlops-repository/stylegan3-sampler:latest
+    inputs:
+      parameters:
+      - {name: image_size}
+      - {name: number_of_images}
+      artifacts:
+      - name: StyleGan-Path
+        path: /tmp/inputs/StyleGan_Path/data
+        raw: {data: /pipelines/component/src/AgeTransformation/pretrained/models/stylegan3-r-ffhq-1024x1024.pkl}
+    outputs:
+      artifacts:
+      - {name: component-Images-dir, path: /tmp/outputs/Images_dir/data}
+      - {name: component-Scores-file, path: /tmp/outputs/Scores_file/data}
+      - {name: component-Seeds-file, path: /tmp/outputs/Seeds_file/data}
+    metadata:
+      labels:
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.14
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+      annotations: {pipelines.kubeflow.org/component_spec: '{"implementation": {"container":
+          {"command": ["python3", "/pipelines/component/src/0_run_sampler.py", "--output-dir-images",
+          {"outputPath": "Images dir"}, "--output-file-seeds", {"outputPath": "Seeds
+          file"}, "--output-file-scores", {"outputPath": "Scores file"}, "--amount-of-image",
+          {"inputValue": "Amount of images"}, "--stylegan-path", {"inputPath": "StyleGan
+          Path"}, "--image-size", {"inputValue": "Image size"}], "image": "us-central1-docker.pkg.dev/inductive-world-365914/adv-mlops-repository/stylegan3-sampler:latest"}},
+          "inputs": [{"description": "Amount of images to generate", "name": "Amount
+          of images", "type": "Integer"}, {"description": "Size of the generated images",
+          "name": "Image size", "type": "Integer"}, {"default": "/pipelines/component/src/AgeTransformation/pretrained/models/stylegan3-r-ffhq-1024x1024.pkl",
+          "description": "Path to the StyleGan model", "name": "StyleGan Path", "type":
+          "String"}], "outputs": [{"description": "Base directory where images are
+          saved", "name": "Images dir", "type": "String"}, {"description": "Path to
+          the file where seeds are saved", "name": "Seeds file", "type": "String"},
+          {"description": "Path to the file where scores are saved", "name": "Scores
+          file", "type": "String"}]}', pipelines.kubeflow.org/component_ref: '{"digest":
+          "a4b932c832cb4761a5ccbceec52167291e4b98f690c73286d95283bd6e0ac550", "url":
+          "../components/StyleGANSampler/component.yaml"}', pipelines.kubeflow.org/arguments.parameters: '{"Amount
+          of images": "{{inputs.parameters.number_of_images}}", "Image size": "{{inputs.parameters.image_size}}"}'}
+  - name: component-2
+    container:
+      args: []
+      command: [python3, /pipelines/component/src/InterfaceTraining/run_latent_classification.py,
+        --input-images, /tmp/inputs/Images_dir/data, --input-seeds, /tmp/inputs/Seeds_file/data,
+        --classifier, '{{inputs.parameters.classifier_type}}', --save-path, /tmp/outputs/Scores/data]
+      image: us-central1-docker.pkg.dev/inductive-world-365914/adv-mlops-repository/latent-classification:latest
+    inputs:
+      parameters:
+      - {name: classifier_type}
+      artifacts:
+      - {name: component-Images-dir, path: /tmp/inputs/Images_dir/data}
+      - {name: component-Seeds-file, path: /tmp/inputs/Seeds_file/data}
+    outputs:
+      artifacts:
+      - {name: component-2-Scores, path: /tmp/outputs/Scores/data}
+    metadata:
+      labels:
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.14
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+      annotations: {pipelines.kubeflow.org/component_spec: '{"implementation": {"container":
+          {"command": ["python3", "/pipelines/component/src/InterfaceTraining/run_latent_classification.py",
+          "--input-images", {"inputPath": "Images dir"}, "--input-seeds", {"inputPath":
+          "Seeds file"}, "--classifier", {"inputValue": "Classifier type"}, "--save-path",
+          {"outputPath": "Scores"}], "image": "us-central1-docker.pkg.dev/inductive-world-365914/adv-mlops-repository/latent-classification:latest"}},
+          "inputs": [{"description": "Path to the input images", "name": "Images dir",
+          "type": "String"}, {"description": "Path to the input seeds", "name": "Seeds
+          file", "type": "String"}, {"description": "Type of the classifier", "name":
+          "Classifier type", "type": "String"}], "outputs": [{"description": "Scores
+          of the generated images", "name": "Scores", "type": "String"}]}', pipelines.kubeflow.org/component_ref: '{"digest":
+          "895058280624bb4d85a83eaf2b8535be7ef5bde521a95684718db2c14f0b5ecb", "url":
+          "../components/LatentClassification/component.yaml"}', pipelines.kubeflow.org/arguments.parameters: '{"Classifier
+          type": "{{inputs.parameters.classifier_type}}"}'}
+  - name: train-boundaries
+    inputs:
+      parameters:
+      - {name: classifier_type}
+      - {name: image_size}
+      - {name: number_of_images}
+    dag:
+      tasks:
+      - name: component
+        template: component
+        arguments:
+          parameters:
+          - {name: image_size, value: '{{inputs.parameters.image_size}}'}
+          - {name: number_of_images, value: '{{inputs.parameters.number_of_images}}'}
+      - name: component-2
+        template: component-2
+        dependencies: [component]
+        arguments:
+          parameters:
+          - {name: classifier_type, value: '{{inputs.parameters.classifier_type}}'}
+          artifacts:
+          - {name: component-Images-dir, from: '{{tasks.component.outputs.artifacts.component-Images-dir}}'}
+          - {name: component-Seeds-file, from: '{{tasks.component.outputs.artifacts.component-Seeds-file}}'}
+  arguments:
+    parameters:
+    - {name: number_of_images, value: '20'}
+    - {name: image_size, value: '256'}
+    - {name: classifier_type, value: smile}
+  serviceAccountName: pipeline-runner

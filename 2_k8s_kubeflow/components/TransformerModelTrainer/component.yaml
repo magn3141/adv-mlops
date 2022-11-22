@@ -1,0 +1,38 @@
+inputs:
+- { name: Scores, type: Artifact, description: 'Path to the scores of the generated images'}
+- { name: Latents file, type: Artifact, description: 'Path to the file where scores are saved'} 
+- { name: Classifiers, type: String, description: 'The classifier to use'}
+- { name: Transformer, type: String, default: 'SVM'}
+- { name: Chosen num, type: Float, default: 0.02 }
+- { name: Split ratio, type: Float, default: 0.7 }
+
+
+outputs:
+- { name: Save Path, type: Artifact, description: 'Base directory where the trained model is saved'}
+
+
+implementation:
+  container:
+    image: us-central1-docker.pkg.dev/inductive-world-365914/adv-mlops-repository/transformer-trainer:latest
+    # command is a list of strings (command-line arguments). 
+    # The YAML language has two syntaxes for lists and you can use either of them. 
+    # Here we use the "flow syntax" - comma-separated strings inside square brackets.
+    command: [
+      python3, 
+      # Path of the program inside the container
+      /pipelines/component/src/InterfaceTraining/run_boundary_trainer.py,
+      --input-latents,
+      {inputPath: Latents file},
+      --scores-path,
+      {inputPath: Scores},
+      --classifiers,
+      {inputValue: Classifiers},
+      --transformer,
+      {inputValue: Transformer},
+      --chosen-num-or-ratio,
+      {inputValue: Chosen num},
+      --split-ratio,
+      {inputValue: Split ratio},
+      --boundaries-path, 
+      {outputPath: Save Path}
+    ]

@@ -1,0 +1,35 @@
+inputs:
+- { name: Amount of images, type: Integer, description: 'Amount of images to generate'}
+- { name: Image size, type: Integer, description: 'Size of the generated images'}
+- { name: StyleGan Path, type: String, default: '/pipelines/component/src/AgeTransformation/pretrained/models/stylegan3-r-ffhq-1024x1024.pkl', description: 'Path to the StyleGan model'}
+
+outputs:
+- { name: Images dir, type: Artifact, description: 'Base directory where images are saved'}
+- { name: Seeds file, type: Artifact, description: 'Path to the file where seeds are saved'}
+- { name: Latents file, type: Artifact, description: 'Path to the file where scores are saved'} 
+
+
+
+implementation:
+  container:
+    image: us-central1-docker.pkg.dev/inductive-world-365914/adv-mlops-repository/stylegan3-sampler:latest
+    # command is a list of strings (command-line arguments). 
+    # The YAML language has two syntaxes for lists and you can use either of them. 
+    # Here we use the "flow syntax" - comma-separated strings inside square brackets.
+    command: [
+      python3, 
+      # Path of the program inside the container
+      /pipelines/component/src/sampler.py,
+      --output-dir-images,
+      {outputPath: Images dir},
+      --output-file-seeds,
+      {outputPath: Seeds file},
+      --output-file-latents,
+      {outputPath: Latents file},
+      --amount-of-image,
+      {inputValue: Amount of images},
+      --stylegan-path, 
+      {inputValue: StyleGan Path},
+      --image-size,
+      {inputValue: Image size}
+    ]

@@ -1,0 +1,26 @@
+inputs:
+- { name: Images dir, type: Artifact, description: 'Path to the input images'}
+- { name: Seeds file, type: Artifact, description: 'Path to the input seeds'}
+- { name: Classifier type, type: String, description: 'Type of the classifier'}
+outputs:
+- { name: Scores, type: Artifact, description: 'Scores of the generated images'}
+
+implementation:
+  container:
+    image: us-central1-docker.pkg.dev/inductive-world-365914/adv-mlops-repository/latent-classification:latest
+    # command is a list of strings (command-line arguments). 
+    # The YAML language has two syntaxes for lists and you can use either of them. 
+    # Here we use the "flow syntax" - comma-separated strings inside square brackets.
+    command: [
+      python3, 
+      # Path of the program inside the container
+      /pipelines/component/src/InterfaceTraining/run_latent_classification.py,
+      --input-images,
+      {inputPath: Images dir},
+      --input-seeds,
+      {inputPath: Seeds file},
+      --classifier,
+      {inputValue: Classifier type},
+      --save-path, 
+      {outputPath: Scores}
+    ]

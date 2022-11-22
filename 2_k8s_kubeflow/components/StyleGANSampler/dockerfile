@@ -1,0 +1,10 @@
+
+FROM gcr.io/deeplearning-platform-release/pytorch-gpu.1-9 
+COPY ./AgeTransformation/requirements.txt .
+RUN python3 -m pip install -U pip wheel cmake
+RUN python3 -m pip install -r requirements.txt
+RUN wget -P ./Agetransformation/pretrained/models/ 'https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-r-ffhq-1024x1024.pkl'
+COPY ./AgeTransformation/ /pipelines/component/src/AgeTransformation/
+COPY ./utilities/ /pipelines/component/src/utilities/
+COPY ./sampler.py /pipelines/component/src/sampler.py
+WORKDIR /pipelines/component/src

@@ -1,0 +1,563 @@
+{
+  "pipelineSpec": {
+    "components": {
+      "comp-component": {
+        "executorLabel": "exec-component",
+        "inputDefinitions": {
+          "artifacts": {
+            "Images dir": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            },
+            "Seeds file": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          },
+          "parameters": {
+            "Classifier type": {
+              "type": "STRING"
+            },
+            "base_output_directory": {
+              "type": "STRING"
+            },
+            "enable_web_access": {
+              "type": "STRING"
+            },
+            "encryption_spec_key_name": {
+              "type": "STRING"
+            },
+            "labels": {
+              "type": "STRING"
+            },
+            "location": {
+              "type": "STRING"
+            },
+            "network": {
+              "type": "STRING"
+            },
+            "project": {
+              "type": "STRING"
+            },
+            "reserved_ip_ranges": {
+              "type": "STRING"
+            },
+            "restart_job_on_worker_restart": {
+              "type": "STRING"
+            },
+            "service_account": {
+              "type": "STRING"
+            },
+            "tensorboard": {
+              "type": "STRING"
+            },
+            "timeout": {
+              "type": "STRING"
+            },
+            "worker_pool_specs": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "Scores": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          },
+          "parameters": {
+            "gcp_resources": {
+              "type": "STRING"
+            }
+          }
+        }
+      },
+      "comp-component-2": {
+        "executorLabel": "exec-component-2",
+        "inputDefinitions": {
+          "artifacts": {
+            "Latents file": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            },
+            "Scores": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          },
+          "parameters": {
+            "Chosen num": {
+              "type": "DOUBLE"
+            },
+            "Classifiers": {
+              "type": "STRING"
+            },
+            "Split ratio": {
+              "type": "DOUBLE"
+            },
+            "Transformer": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "Save Path": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      },
+      "comp-importer": {
+        "executorLabel": "exec-importer",
+        "inputDefinitions": {
+          "parameters": {
+            "uri": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "artifact": {
+              "artifactType": {
+                "schemaTitle": "system.Dataset",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      },
+      "comp-importer-2": {
+        "executorLabel": "exec-importer-2",
+        "inputDefinitions": {
+          "parameters": {
+            "uri": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "artifact": {
+              "artifactType": {
+                "schemaTitle": "system.Dataset",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      },
+      "comp-importer-3": {
+        "executorLabel": "exec-importer-3",
+        "inputDefinitions": {
+          "parameters": {
+            "uri": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "artifact": {
+              "artifactType": {
+                "schemaTitle": "system.Dataset",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      }
+    },
+    "deploymentSpec": {
+      "executors": {
+        "exec-component": {
+          "container": {
+            "args": [
+              "--type",
+              "CustomJob",
+              "--payload",
+              "{\"display_name\": \"\", \"job_spec\": {\"worker_pool_specs\": {{$.inputs.parameters['worker_pool_specs']}}, \"scheduling\": {\"timeout\": \"{{$.inputs.parameters['timeout']}}\", \"restart_job_on_worker_restart\": \"{{$.inputs.parameters['restart_job_on_worker_restart']}}\"}, \"service_account\": \"{{$.inputs.parameters['service_account']}}\", \"tensorboard\": \"{{$.inputs.parameters['tensorboard']}}\", \"enable_web_access\": \"{{$.inputs.parameters['enable_web_access']}}\", \"network\": \"{{$.inputs.parameters['network']}}\", \"reserved_ip_ranges\": {{$.inputs.parameters['reserved_ip_ranges']}}, \"base_output_directory\": {\"output_uri_prefix\": \"{{$.inputs.parameters['base_output_directory']}}\"}}, \"labels\": {{$.inputs.parameters['labels']}}, \"encryption_spec\": {\"kms_key_name\":\"{{$.inputs.parameters['encryption_spec_key_name']}}\"}}",
+              "--project",
+              "{{$.inputs.parameters['project']}}",
+              "--location",
+              "{{$.inputs.parameters['location']}}",
+              "--gcp_resources",
+              "{{$.outputs.parameters['gcp_resources'].output_file}}"
+            ],
+            "command": [
+              "python3",
+              "-u",
+              "-m",
+              "google_cloud_pipeline_components.container.v1.custom_job.launcher"
+            ],
+            "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:1.0.26"
+          }
+        },
+        "exec-component-2": {
+          "container": {
+            "command": [
+              "python3",
+              "/pipelines/component/src/InterfaceTraining/run_boundary_trainer.py",
+              "--input-latents",
+              "{{$.inputs.artifacts['Latents file'].path}}",
+              "--scores-path",
+              "{{$.inputs.artifacts['Scores'].path}}",
+              "--classifiers",
+              "{{$.inputs.parameters['Classifiers']}}",
+              "--transformer",
+              "{{$.inputs.parameters['Transformer']}}",
+              "--chosen-num-or-ratio",
+              "{{$.inputs.parameters['Chosen num']}}",
+              "--split-ratio",
+              "{{$.inputs.parameters['Split ratio']}}",
+              "--boundaries-path",
+              "{{$.outputs.artifacts['Save Path'].path}}"
+            ],
+            "image": "us-central1-docker.pkg.dev/inductive-world-365914/adv-mlops-repository/transformer-trainer:latest"
+          }
+        },
+        "exec-importer": {
+          "importer": {
+            "artifactUri": {
+              "constantValue": {
+                "stringValue": "gs://adv-mlops-bucket/dataset-24112/images/"
+              }
+            },
+            "typeSchema": {
+              "schemaTitle": "system.Dataset",
+              "schemaVersion": "0.0.1"
+            }
+          }
+        },
+        "exec-importer-2": {
+          "importer": {
+            "artifactUri": {
+              "constantValue": {
+                "stringValue": "gs://adv-mlops-bucket/dataset-24112/seeds.npy"
+              }
+            },
+            "typeSchema": {
+              "schemaTitle": "system.Dataset",
+              "schemaVersion": "0.0.1"
+            }
+          }
+        },
+        "exec-importer-3": {
+          "importer": {
+            "artifactUri": {
+              "constantValue": {
+                "stringValue": "gs://adv-mlops-bucket/dataset-24112/latents.npy"
+              }
+            },
+            "typeSchema": {
+              "schemaTitle": "system.Dataset",
+              "schemaVersion": "0.0.1"
+            }
+          }
+        }
+      }
+    },
+    "pipelineInfo": {
+      "name": "train-boundaries-no-gpu"
+    },
+    "root": {
+      "dag": {
+        "tasks": {
+          "component": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-component"
+            },
+            "dependentTasks": [
+              "importer",
+              "importer-2"
+            ],
+            "inputs": {
+              "artifacts": {
+                "Images dir": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "artifact",
+                    "producerTask": "importer"
+                  }
+                },
+                "Seeds file": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "artifact",
+                    "producerTask": "importer-2"
+                  }
+                }
+              },
+              "parameters": {
+                "Classifier type": {
+                  "componentInputParameter": "classifier_type"
+                },
+                "base_output_directory": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "enable_web_access": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "false"
+                    }
+                  }
+                },
+                "encryption_spec_key_name": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "labels": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "{}"
+                    }
+                  }
+                },
+                "location": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "us-central1"
+                    }
+                  }
+                },
+                "network": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "project": {
+                  "componentInputParameter": "project_id"
+                },
+                "reserved_ip_ranges": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "[]"
+                    }
+                  }
+                },
+                "restart_job_on_worker_restart": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "false"
+                    }
+                  }
+                },
+                "service_account": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "tensorboard": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "timeout": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "604800s"
+                    }
+                  }
+                },
+                "worker_pool_specs": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "[{\"machine_spec\": {\"machine_type\": \"n1-standard-16\", \"accelerator_type\": 1, \"accelerator_count\": 8}, \"replica_count\": 1, \"container_spec\": {\"image_uri\": \"us-central1-docker.pkg.dev/inductive-world-365914/adv-mlops-repository/latent-classification:latest\", \"command\": [\"python3\", \"/pipelines/component/src/InterfaceTraining/run_latent_classification.py\", \"--input-images\", \"{{$.inputs.artifacts['Images dir'].path}}\", \"--input-seeds\", \"{{$.inputs.artifacts['Seeds file'].path}}\", \"--classifier\", \"{{$.inputs.parameters['Classifier type']}}\", \"--save-path\", \"{{$.outputs.artifacts['Scores'].path}}\"]}, \"disk_spec\": {\"boot_disk_type\": \"pd-ssd\", \"boot_disk_size_gb\": 100}}]"
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "component"
+            }
+          },
+          "component-2": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-component-2"
+            },
+            "dependentTasks": [
+              "component",
+              "importer-3"
+            ],
+            "inputs": {
+              "artifacts": {
+                "Latents file": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "artifact",
+                    "producerTask": "importer-3"
+                  }
+                },
+                "Scores": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "Scores",
+                    "producerTask": "component"
+                  }
+                }
+              },
+              "parameters": {
+                "Chosen num": {
+                  "componentInputParameter": "chosen_num_ratio"
+                },
+                "Classifiers": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "sad,surprise,fear,happy,angry"
+                    }
+                  }
+                },
+                "Split ratio": {
+                  "componentInputParameter": "split_ratio"
+                },
+                "Transformer": {
+                  "componentInputParameter": "transformer"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "component-2"
+            }
+          },
+          "importer": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-importer"
+            },
+            "inputs": {
+              "parameters": {
+                "uri": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "gs://adv-mlops-bucket/dataset-24112/images/"
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "importer"
+            }
+          },
+          "importer-2": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-importer-2"
+            },
+            "inputs": {
+              "parameters": {
+                "uri": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "gs://adv-mlops-bucket/dataset-24112/seeds.npy"
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "importer-2"
+            }
+          },
+          "importer-3": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-importer-3"
+            },
+            "inputs": {
+              "parameters": {
+                "uri": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "gs://adv-mlops-bucket/dataset-24112/latents.npy"
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "importer-3"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "chosen_num_ratio": {
+            "type": "DOUBLE"
+          },
+          "classifier_type": {
+            "type": "STRING"
+          },
+          "project_id": {
+            "type": "STRING"
+          },
+          "split_ratio": {
+            "type": "DOUBLE"
+          },
+          "transformer": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    "schemaVersion": "2.0.0",
+    "sdkVersion": "kfp-1.8.14"
+  },
+  "runtimeConfig": {
+    "parameters": {
+      "chosen_num_ratio": {
+        "doubleValue": 0.1
+      },
+      "classifier_type": {
+        "stringValue": "black"
+      },
+      "project_id": {
+        "stringValue": "inductive-world-365914"
+      },
+      "split_ratio": {
+        "doubleValue": 0.7
+      },
+      "transformer": {
+        "stringValue": "SVM"
+      }
+    }
+  }
+}
