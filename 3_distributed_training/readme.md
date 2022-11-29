@@ -15,7 +15,11 @@ In the folder `1_stylegan2-ada-example`, we have a more complex example of how t
 ## References
 
 Look at this: <https://www.youtube.com/watch?v=qctwfYZKK8M>
+
 Look at this: <https://codelabs.developers.google.com/vertex_multiworker_training#0>
+
 Look at this: <https://keras.io/examples/generative/gan_ada/>
+
 Loot at his: <https://pytorch.org/tutorials/intermediate/ddp_series_multinode.html>
+
 Look at this: <https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/reduction_server/pytorch_distributed_training_reduction_server.ipynb>
