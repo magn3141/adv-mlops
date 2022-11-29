@@ -1,8 +1,6 @@
 # Basic k8s
 
-How to install k8s on GCP and connect with kubectl to it.
-
-I started by installing kubeernetes on my local machine using minikube. This is a good way to get started with kubernetes. Here I tested some basic commands and I got a basic understanding of how kubernetes works. I used the code from this [tutorial](https://kubernetes.io/docs/tutorials/hello-minikube/).
+I started using looking at kubeernetes. I started by installing kubeernetes on my local machine using minikube. This is a good way to get started with kubernetes. Here I tested some basic commands and I got a basic understanding of how kubernetes works. I used the code from this [tutorial](https://kubernetes.io/docs/tutorials/hello-minikube/).
 
 Then I installed kubernetes on GCP. I followed the instructions from this [tutorial](https://cloud.google.com/kubernetes-engine/docs/quickstart). I created a cluster and I connected to it using kubectl. I added the different commands I used to create the cluster and connect to it in step folder.
 
@@ -10,6 +8,7 @@ Then I installed kubernetes on GCP. I followed the instructions from this [tutor
 
 1. Install kubectl
 <https://kubernetes.io/docs/tasks/tools/install-kubectl/>
+
 ```bash
 brew install kubectl
 ```

@@ -17,6 +17,7 @@ Install conda for your platform. See [here](https://docs.conda.io/projects/conda
 ```
 
 ### Run steps
+
 We will first install kubeflow on the create K8 cluster in GCP.
 
 1 Run
@@ -24,9 +25,11 @@ We will first install kubeflow on the create K8 cluster in GCP.
 1 Run `2.0_create_bucket.sh` to create a bucket for the pipeline data.
 
 ## Kubeflow Pipelines
+
 Kubeflow pipelines are a way to orchestrate the execution of multiple containers in a Kubeflow cluster. The containers can be written in any language and can be used to perform any task. The containers can be chained together to form a pipeline. Kubeflow can automatically pipe output data to the next pipeline component. This allows for the creation of complex pipelines that can be run on a Kubeflow cluster. Vertex AI, googles ai platform, also supports Kubeflow pipelines.
 
 ### Kubeflow Component
+
 There is different ways to define a kubeflow component. You can either created directly in python, by defining a function [1](https://www.kubeflow.org/docs/components/pipelines/v1/sdk-v2/python-function-components/), or by defining a container [2](https://www.kubeflow.org/docs/components/pipelines/v1/sdk-v2/component-development/). In this project we will use the second approach. This allows us to easy use existing code and docker images.
 
 ### Train boundary interfaceGAN
