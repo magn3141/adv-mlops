@@ -2,7 +2,31 @@
 
 How to install k8s on GCP and connect with kubectl to it.
 
-## Steps
+I started by installing kubeernetes on my local machine using minikube. This is a good way to get started with kubernetes. Here I tested some basic commands and I got a basic understanding of how kubernetes works. I used the code from this [tutorial](https://kubernetes.io/docs/tutorials/hello-minikube/).
+
+Then I installed kubernetes on GCP. I followed the instructions from this [tutorial](https://cloud.google.com/kubernetes-engine/docs/quickstart). I created a cluster and I connected to it using kubectl. I added the different commands I used to create the cluster and connect to it in step folder.
+
+## Installations Steps Local
+
+1. Install kubectl
+<https://kubernetes.io/docs/tasks/tools/install-kubectl/>
+```bash
+brew install kubectl
+```
+
+2. Install minikube
+
+```bash
+    brew install minikube
+```
+
+3. Start minikube
+
+```bash
+    minikube start
+```
+
+## Installations Steps GCP
 
 1. Create a GCP account
 First, you need to create a GCP account. You can do this by going to <https://cloud.google.com/> and clicking on the "Try for free" button. You will need to enter your credit card details, but you will not be charged anything unless you exceed the free tier limits.
@@ -14,7 +38,7 @@ Once you have created a GCP account, you need to create a project. You can do th
 You need to install gcloud and kubectl on your local machine. You can do this by following the instructions here: <https://cloud.google.com/sdk/docs/install>.
 
 4. Run `./steps/1.1_enable_glcloud_apis.sh`
-This script will enable gcloud apis for you.
+This script will enable the relevant gcloud apis for you.
 
 5. Run `./steps/1.2_create_cluster.sh`
 Run this script to create a cluster. You can change the cluster name and zone in the script.
