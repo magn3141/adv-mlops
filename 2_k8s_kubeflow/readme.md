@@ -38,4 +38,4 @@ This pipeline trains a interfaceGAN boundary for StyleGAN3. The pipeline consist
 
 ## References
 
-[1] [https://codelabs.developers.google.com/codelabs/cloud-kubeflow-pipelines-gis/index.html?index=..%2F..index#2](https://codelabs.developers.google.com/codelabs/cloud-kubeflow-pipelines-gis/index.html?index=..%2F..index#2)
+[Guide to run kubeflow] [https://codelabs.developers.google.com/codelabs/cloud-kubeflow-pipelines-gis/index.html?index=..%2F..index#2](https://codelabs.developers.google.com/codelabs/cloud-kubeflow-pipelines-gis/index.html?index=..%2F..index#2)
