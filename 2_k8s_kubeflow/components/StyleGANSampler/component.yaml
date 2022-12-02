@@ -9,7 +9,6 @@ outputs:
 - { name: Latents file, type: Artifact, description: 'Path to the file where scores are saved'} 
 
 
-
 implementation:
   container:
     image: us-central1-docker.pkg.dev/inductive-world-365914/adv-mlops-repository/stylegan3-sampler:latest

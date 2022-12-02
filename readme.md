@@ -4,8 +4,7 @@ This repository contains the code for the Advanced MLOps course. I have focused 
 
 1. [Part 1](1_k8s/): Basic usage of Kubernetes
 2. [Part 2](2_k8s_kubeflow/): Setting up piplelines with kubeFlow
-3. [Part 3](3_distributed_training/): Distributed training with pytorch & tensorflow
-4. [Part 4](4_hosting/): Serving models with Cloudflare Workers
+3. [Part 3](3_distributed_training/): Distributed training with pytorch & tensorflow in the cloud
 
 ## Part 1 - Kubernetes
 
